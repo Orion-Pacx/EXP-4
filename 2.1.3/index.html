@@ -1,1 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2.1.3 E-commerce Catalog</title>
+  <style>
+    :root{
+      --bg:#07111f;
+      --bg2:#0d1726;
+      --panel:rgba(15,23,42,.82);
+      --line:rgba(255,255,255,.08);
+      --text:#e6eefb;
+      --muted:#97a8c3;
+      --accent:#7c3aed;
+      --accent2:#06b6d4;
+      --green:#22c55e;
+      --yellow:#f59e0b;
+      --red:#ef4444;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 12% 10%, rgba(124,58,237,.2), transparent 24%),
+        radial-gradient(circle at 88% 12%, rgba(6,182,212,.16), transparent 22%),
+        linear-gradient(160deg,var(--bg),var(--bg2));
+      min-height:100vh;
+    }
+    .wrap{
+      width:min(1380px,calc(100% - 24px));
+      margin:auto;
+      padding:22px 0 28px;
+    }
+    .hero,.panel{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:24px;
+      backdrop-filter:blur(14px);
+      box-shadow:0 20px 60px rgba(0,0,0,.35);
+    }
+    .hero{
+      padding:22px;
+      margin-bottom:18px;
+    }
+    .badge{
+      display:inline-flex;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      color:var(--muted);
+      font-size:.82rem;
+      margin-bottom:12px;
+    }
+    h1{
+      margin:0 0 8px;
+      font-size:clamp(1.8rem,4vw,3rem);
+      letter-spacing:-.04em;
+    }
+    .sub{
+      margin:0;
+      color:var(--muted);
+      line-height:1.6;
+    }
+    .layout{
+      display:grid;
+      grid-template-columns:1.05fr 1.35fr;
+      gap:18px;
+    }
+    .panel-head{
+      padding:18px 20px;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .panel-body{padding:18px}
+    .title{
+      font-weight:700;
+      font-size:1rem;
+    }
+    .muted{color:var(--muted)}
+    .form-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+      margin-bottom:12px;
+    }
+    .input,.btn,.textarea{
+      width:100%;
+      border:none;
+      outline:none;
+      border-radius:14px;
+      padding:13px 14px;
+      font:inherit;
+    }
+    .input,.textarea{
+      background:rgba(255,255,255,.05);
+      border:1px solid var(--line);
+      color:var(--text);
+    }
+    .textarea{
+      min-height:92px;
+      resize:vertical;
+    }
+    .btn{
+      cursor:pointer;
+      font-weight:700;
+      color:white;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      transition:.2s ease;
+    }
+    .btn:hover{transform:translateY(-2px)}
+    .btn.secondary{
+      background:rgba(255,255,255,.06);
+      border:1px solid var(--line);
+      color:var(--text);
+    }
+    .btn.warn{
+      background:linear-gradient(135deg,#f59e0b,#ea580c);
+    }
+    .actions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+      margin-top:12px;
+    }
+    .cards{
+      display:grid;
+      gap:14px;
+    }
+    .product{
+      border:1px solid var(--line);
+      border-radius:20px;
+      background:rgba(255,255,255,.04);
+      overflow:hidden;
+    }
+    .product-top{
+      padding:16px 16px 12px;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .product-name{
+      font-size:1.12rem;
+      font-weight:800;
+      margin-bottom:6px;
+    }
+    .chip-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+    .chip{
+      padding:7px 11px;
+      border-radius:999px;
+      background:rgba(255,255,255,.05);
+      border:1px solid var(--line);
+      font-size:.78rem;
+      color:#dce7f8;
+    }
+    .product-body{
+      padding:14px 16px 16px;
+      display:grid;
+      gap:12px;
+    }
+    .section-label{
+      font-size:.82rem;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      margin-bottom:6px;
+    }
+    .variant-list,.review-list{
+      display:grid;
+      gap:10px;
+    }
+    .variant,.review{
+      border:1px solid rgba(255,255,255,.06);
+      background:#091321;
+      border-radius:16px;
+      padding:12px;
+    }
+    .variant-top{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:8px;
+    }
+    .variant strong,.review strong{
+      font-size:.95rem;
+    }
+    .variant small,.review small{
+      color:var(--muted);
+    }
+    .stock-actions{
+      display:grid;
+      grid-template-columns:1fr auto auto;
+      gap:8px;
+      margin-top:10px;
+    }
+    .log{
+      height:180px;
+      overflow:auto;
+      padding:14px;
+      border-radius:18px;
+      background:#08111d;
+      border:1px solid var(--line);
+      font-size:.88rem;
+      line-height:1.55;
+      margin-top:14px;
+    }
+    .log-entry{
+      padding:8px 0;
+      border-bottom:1px solid rgba(255,255,255,.06);
+    }
+    .topbar{
+      display:grid;
+      grid-template-columns:1fr auto auto;
+      gap:12px;
+      margin-bottom:14px;
+    }
+    .stat-row{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:12px;
+      margin-bottom:14px;
+    }
+    .stat{
+      padding:14px;
+      border-radius:18px;
+      background:rgba(255,255,255,.04);
+      border:1px solid var(--line);
+    }
+    .stat small{
+      color:var(--muted);
+      display:block;
+      margin-bottom:6px;
+    }
+    .stat strong{
+      font-size:1.35rem;
+    }
+    .empty{
+      padding:18px;
+      border:1px dashed rgba(255,255,255,.14);
+      border-radius:18px;
+      color:var(--muted);
+      text-align:center;
+      background:rgba(255,255,255,.03);
+    }
+    .api{
+      font-size:.8rem;
+      color:var(--muted);
+      word-break:break-all;
+    }
+    @media(max-width:1100px){
+      .layout{grid-template-columns:1fr}
+    }
+    @media(max-width:760px){
+      .form-grid,.actions,.topbar,.stat-row,.stock-actions{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <div class="badge">Experiment 2.1.3 • Live frontend connected to MongoDB backend</div>
+      <h1>E-commerce Catalog</h1>
+      <p class="sub">Create products with nested variants and reviews, fetch them from MongoDB, and update stock live through the Railway backend.</p>
+    </div>
 
+    <div class="layout">
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="title">Create Product</div>
+            <div class="muted">Single-click demo insert supported</div>
+          </div>
+          <div class="api" id="apiUrlText"></div>
+        </div>
+        <div class="panel-body">
+          <div class="form-grid">
+            <input id="name" class="input" placeholder="Product name" value="Premium Headphones">
+            <input id="category" class="input" placeholder="Category" value="Electronics">
+          </div>
+
+          <div class="form-grid">
+            <input id="sku1" class="input" placeholder="Variant 1 SKU" value="HP-BL-001">
+            <input id="color1" class="input" placeholder="Variant 1 Color" value="Black">
+          </div>
+
+          <div class="form-grid">
+            <input id="price1" class="input" type="number" placeholder="Variant 1 Price" value="199.99">
+            <input id="stock1" class="input" type="number" placeholder="Variant 1 Stock" value="15">
+          </div>
+
+          <div class="form-grid">
+            <input id="sku2" class="input" placeholder="Variant 2 SKU" value="HP-WH-001">
+            <input id="color2" class="input" placeholder="Variant 2 Color" value="White">
+          </div>
+
+          <div class="form-grid">
+            <input id="price2" class="input" type="number" placeholder="Variant 2 Price" value="209.99">
+            <input id="stock2" class="input" type="number" placeholder="Variant 2 Stock" value="8">
+          </div>
+
+          <div class="form-grid">
+            <input id="reviewUser" class="input" placeholder="Review userId" value="65f4a8b7c1e6a8c1f4b8c7d1">
+            <input id="reviewRating" class="input" type="number" min="1" max="5" placeholder="Rating" value="5">
+          </div>
+
+          <textarea id="reviewComment" class="textarea" placeholder="Review comment">Excellent sound quality</textarea>
+
+          <div class="actions">
+            <button class="btn" id="createBtn">Create Product</button>
+            <button class="btn secondary" id="loadBtn">Load Products</button>
+          </div>
+
+          <div class="log" id="logBox"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="title">Catalog Output</div>
+            <div class="muted">Live data from MongoDB</div>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="topbar">
+            <input id="searchInput" class="input" placeholder="Search by name or category">
+            <button class="btn secondary" id="topBtn">Top Rated</button>
+            <button class="btn secondary" id="refreshBtn">Refresh</button>
+          </div>
+
+          <div class="stat-row">
+            <div class="stat"><small>Total Products</small><strong id="totalProducts">0</strong></div>
+            <div class="stat"><small>Total Variants</small><strong id="totalVariants">0</strong></div>
+            <div class="stat"><small>Total Reviews</small><strong id="totalReviews">0</strong></div>
+          </div>
+
+          <div class="cards" id="productList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const BASE_URL = "https://exp-4-backend-production.up.railway.app/api/2.1.3";
+
+    const apiUrlText = document.getElementById("apiUrlText");
+    const logBox = document.getElementById("logBox");
+    const productList = document.getElementById("productList");
+    const totalProducts = document.getElementById("totalProducts");
+    const totalVariants = document.getElementById("totalVariants");
+    const totalReviews = document.getElementById("totalReviews");
+    const searchInput = document.getElementById("searchInput");
+
+    const createBtn = document.getElementById("createBtn");
+    const loadBtn = document.getElementById("loadBtn");
+    const refreshBtn = document.getElementById("refreshBtn");
+    const topBtn = document.getElementById("topBtn");
+
+    let products = [];
+    let showingTopRated = false;
+
+    apiUrlText.textContent = BASE_URL;
+
+    function log(message) {
+      const item = document.createElement("div");
+      item.className = "log-entry";
+      item.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      logBox.prepend(item);
+    }
+
+    function getFormPayload() {
+      return {
+        name: document.getElementById("name").value.trim(),
+        category: document.getElementById("category").value.trim(),
+        variants: [
+          {
+            sku: document.getElementById("sku1").value.trim(),
+            color: document.getElementById("color1").value.trim(),
+            price: Number(document.getElementById("price1").value),
+            stock: Number(document.getElementById("stock1").value)
+          },
+          {
+            sku: document.getElementById("sku2").value.trim(),
+            color: document.getElementById("color2").value.trim(),
+            price: Number(document.getElementById("price2").value),
+            stock: Number(document.getElementById("stock2").value)
+          }
+        ],
+        reviews: [
+          {
+            userId: document.getElementById("reviewUser").value.trim(),
+            rating: Number(document.getElementById("reviewRating").value),
+            comment: document.getElementById("reviewComment").value.trim()
+          }
+        ]
+      };
+    }
+
+    function updateStats(data) {
+      totalProducts.textContent = data.length;
+      totalVariants.textContent = data.reduce((sum, p) => sum + (p.variants?.length || 0), 0);
+      totalReviews.textContent = data.reduce((sum, p) => sum + (p.reviews?.length || 0), 0);
+    }
+
+    function renderProducts(data) {
+      const query = searchInput.value.trim().toLowerCase();
+      const filtered = data.filter(product => {
+        const name = (product.name || "").toLowerCase();
+        const category = (product.category || "").toLowerCase();
+        return name.includes(query) || category.includes(query);
+      });
+
+      updateStats(filtered);
+      productList.innerHTML = "";
+
+      if (!filtered.length) {
+        productList.innerHTML = `<div class="empty">No products found</div>`;
+        return;
+      }
+
+      filtered.forEach(product => {
+        const card = document.createElement("div");
+        card.className = "product";
+
+        const variantsHtml = (product.variants || []).map(variant => `
+          <div class="variant">
+            <div class="variant-top">
+              <div>
+                <strong>${variant.color || "Variant"}</strong><br>
+                <small>SKU: ${variant.sku}</small>
+              </div>
+              <div>
+                <strong>₹ ${variant.price}</strong><br>
+                <small>Stock: <span id="stock-${variant.sku}">${variant.stock}</span></small>
+              </div>
+            </div>
+            <div class="stock-actions">
+              <input class="input" id="input-${variant.sku}" type="number" placeholder="New stock">
+              <button class="btn secondary" onclick="updateStock('${variant.sku}')">Update Stock</button>
+              <button class="btn warn" onclick="quickReduceStock('${variant.sku}', ${variant.stock})">-1</button>
+            </div>
+          </div>
+        `).join("");
+
+        const reviewsHtml = (product.reviews || []).map(review => `
+          <div class="review">
+            <strong>Rating: ${review.rating}/5</strong><br>
+            <small>${review.comment || "No comment"}</small>
+          </div>
+        `).join("");
+
+        card.innerHTML = `
+          <div class="product-top">
+            <div>
+              <div class="product-name">${product.name}</div>
+              <div class="muted">${product.category}</div>
+            </div>
+            <div class="chip-row">
+              <span class="chip">Avg Rating: ${product.avgRating || 0}</span>
+              <span class="chip">Variants: ${(product.variants || []).length}</span>
+              <span class="chip">Reviews: ${(product.reviews || []).length}</span>
+            </div>
+          </div>
+          <div class="product-body">
+            <div>
+              <div class="section-label">Variants</div>
+              <div class="variant-list">${variantsHtml || `<div class="empty">No variants</div>`}</div>
+            </div>
+            <div>
+              <div class="section-label">Reviews</div>
+              <div class="review-list">${reviewsHtml || `<div class="empty">No reviews</div>`}</div>
+            </div>
+          </div>
+        `;
+
+        productList.appendChild(card);
+      });
+    }
+
+    async function loadProducts() {
+      showingTopRated = false;
+      try {
+        const res = await fetch(`${BASE_URL}/products`);
+        products = await res.json();
+        renderProducts(products);
+        log("Products loaded");
+      } catch (err) {
+        log("Failed to load products");
+      }
+    }
+
+    async function loadTopRated() {
+      showingTopRated = true;
+      try {
+        const res = await fetch(`${BASE_URL}/aggregation/top-products`);
+        const data = await res.json();
+        renderProducts(data);
+        log("Top-rated products loaded");
+      } catch (err) {
+        log("Failed to load top-rated products");
+      }
+    }
+
+    async function createProduct() {
+      const payload = getFormPayload();
+
+      try {
+        const res = await fetch(`${BASE_URL}/products`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+
+        if (data.error) {
+          log(`Create failed: ${data.error}`);
+          return;
+        }
+
+        log(`Product created: ${data.name}`);
+        await loadProducts();
+      } catch (err) {
+        log("Failed to create product");
+      }
+    }
+
+    async function updateStock(sku) {
+      const input = document.getElementById(`input-${sku}`);
+      const stock = Number(input.value);
+
+      if (Number.isNaN(stock)) {
+        log("Enter valid stock value");
+        return;
+      }
+
+      try {
+        const res = await fetch(`${BASE_URL}/stock/${sku}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ stock })
+        });
+
+        const data = await res.json();
+
+        if (data?.error) {
+          log(`Stock update failed: ${data.error}`);
+          return;
+        }
+
+        log(`Stock updated for ${sku} -> ${stock}`);
+        showingTopRated ? await loadTopRated() : await loadProducts();
+      } catch (err) {
+        log("Stock update failed");
+      }
+    }
+
+    async function quickReduceStock(sku, currentStock) {
+      const newStock = Math.max(0, Number(currentStock) - 1);
+
+      try {
+        const res = await fetch(`${BASE_URL}/stock/${sku}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ stock: newStock })
+        });
+
+        const data = await res.json();
+
+        if (data?.error) {
+          log(`Quick stock update failed: ${data.error}`);
+          return;
+        }
+
+        log(`Stock reduced for ${sku} -> ${newStock}`);
+        showingTopRated ? await loadTopRated() : await loadProducts();
+      } catch (err) {
+        log("Quick stock update failed");
+      }
+    }
+
+    createBtn.onclick = createProduct;
+    loadBtn.onclick = loadProducts;
+    refreshBtn.onclick = () => showingTopRated ? loadTopRated() : loadProducts();
+    topBtn.onclick = loadTopRated;
+    searchInput.oninput = () => renderProducts(products);
+
+    window.updateStock = updateStock;
+    window.quickReduceStock = quickReduceStock;
+
+    loadProducts();
+  </script>
+</body>
+</html>
