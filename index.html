@@ -1,51 +1,544 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EXP-4 Experiments</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EXP-4 Dashboard</title>
 
-<style>
-body{
-    margin:0;
-    font-family:system-ui;
-    background:#0f172a;
-    color:white;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
-}
+  <style>
+    :root{
+      --bg:#07111f;
+      --bg2:#0b1728;
+      --panel:rgba(15,23,42,.62);
+      --panel-2:rgba(255,255,255,.06);
+      --border:rgba(255,255,255,.12);
+      --text:#e5eefc;
+      --muted:#96a7c2;
+      --accent:#7c3aed;
+      --accent-2:#06b6d4;
+      --accent-3:#22c55e;
+      --shadow:0 20px 60px rgba(0,0,0,.45);
+    }
 
-.container{
-    text-align:center;
-}
+    *{
+      box-sizing:border-box;
+    }
 
-a{
-    display:block;
-    margin:20px;
-    padding:15px 25px;
-    background:#1e293b;
-    border-radius:8px;
-    text-decoration:none;
-    color:white;
-    font-weight:600;
-}
+    html{
+      scroll-behavior:smooth;
+    }
 
-a:hover{
-    background:#334155;
-}
-</style>
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 15% 20%, rgba(124,58,237,.18), transparent 26%),
+        radial-gradient(circle at 85% 25%, rgba(6,182,212,.16), transparent 24%),
+        radial-gradient(circle at 50% 85%, rgba(34,197,94,.10), transparent 26%),
+        linear-gradient(160deg, var(--bg) 0%, var(--bg2) 100%);
+      overflow-x:hidden;
+      position:relative;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+      background-size:42px 42px;
+      mask-image:radial-gradient(circle at center, black 55%, transparent 95%);
+      pointer-events:none;
+      opacity:.55;
+    }
+
+    body::after{
+      content:"";
+      position:fixed;
+      width:560px;
+      height:560px;
+      border-radius:50%;
+      background:conic-gradient(from 180deg, rgba(124,58,237,.28), rgba(6,182,212,.2), rgba(34,197,94,.16), rgba(124,58,237,.28));
+      filter:blur(80px);
+      top:-180px;
+      right:-120px;
+      animation:floatGlow 14s ease-in-out infinite;
+      pointer-events:none;
+      opacity:.9;
+    }
+
+    @keyframes floatGlow{
+      0%,100%{ transform:translate3d(0,0,0) scale(1); }
+      50%{ transform:translate3d(-50px,35px,0) scale(1.06); }
+    }
+
+    .page{
+      width:min(1200px, calc(100% - 32px));
+      margin:0 auto;
+      padding:40px 0 48px;
+      position:relative;
+      z-index:1;
+    }
+
+    .hero{
+      position:relative;
+      padding:34px;
+      border:1px solid var(--border);
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(18px);
+      -webkit-backdrop-filter:blur(18px);
+      border-radius:28px;
+      overflow:hidden;
+      isolation:isolate;
+    }
+
+    .hero::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background:linear-gradient(120deg, rgba(124,58,237,.26), transparent 28%, transparent 70%, rgba(6,182,212,.24));
+      z-index:-2;
+    }
+
+    .hero::after{
+      content:"";
+      position:absolute;
+      width:280px;
+      height:280px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(255,255,255,.14), transparent 68%);
+      right:-60px;
+      top:-60px;
+      z-index:-1;
+    }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:18px;
+      flex-wrap:wrap;
+      margin-bottom:26px;
+    }
+
+    .repo-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 14px;
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:999px;
+      background:rgba(255,255,255,.04);
+      color:#dce8ff;
+      font-size:.92rem;
+      letter-spacing:.02em;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.07);
+    }
+
+    .repo-dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow:0 0 16px rgba(124,58,237,.7);
+      flex:none;
+    }
+
+    .status-wrap{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+
+    .status{
+      padding:9px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.1);
+      background:rgba(255,255,255,.045);
+      color:var(--muted);
+      font-size:.84rem;
+    }
+
+    .hero h1{
+      margin:0 0 14px;
+      font-size:clamp(2rem, 5vw, 4rem);
+      line-height:1.05;
+      letter-spacing:-.04em;
+      max-width:760px;
+    }
+
+    .hero p{
+      margin:0;
+      max-width:760px;
+      color:var(--muted);
+      font-size:1rem;
+      line-height:1.7;
+    }
+
+    .meta{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0,1fr));
+      gap:14px;
+      margin-top:28px;
+    }
+
+    .meta-card{
+      padding:16px 18px;
+      border-radius:20px;
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+    }
+
+    .meta-card span{
+      display:block;
+      color:var(--muted);
+      font-size:.82rem;
+      margin-bottom:8px;
+    }
+
+    .meta-card strong{
+      font-size:1.05rem;
+      font-weight:700;
+      color:#f6fbff;
+    }
+
+    .section{
+      margin-top:28px;
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:18px;
+    }
+
+    .card{
+      position:relative;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      min-height:280px;
+      text-decoration:none;
+      color:inherit;
+      padding:22px;
+      border-radius:26px;
+      border:1px solid rgba(255,255,255,.1);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.035));
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(16px);
+      -webkit-backdrop-filter:blur(16px);
+      overflow:hidden;
+      transform:translateY(0);
+      transition:
+        transform .28s ease,
+        border-color .28s ease,
+        box-shadow .28s ease,
+        background .28s ease;
+      isolation:isolate;
+    }
+
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(115deg, transparent 20%, rgba(255,255,255,.12) 50%, transparent 80%);
+      transform:translateX(-130%);
+      transition:transform .8s ease;
+      pointer-events:none;
+    }
+
+    .card::after{
+      content:"";
+      position:absolute;
+      width:220px;
+      height:220px;
+      border-radius:50%;
+      filter:blur(50px);
+      opacity:.32;
+      z-index:-1;
+      right:-70px;
+      bottom:-70px;
+      transition:opacity .28s ease, transform .28s ease;
+    }
+
+    .card-1::after{
+      background:radial-gradient(circle, rgba(124,58,237,.9), transparent 65%);
+    }
+
+    .card-2::after{
+      background:radial-gradient(circle, rgba(6,182,212,.9), transparent 65%);
+    }
+
+    .card:hover{
+      transform:translateY(-8px);
+      border-color:rgba(255,255,255,.18);
+      box-shadow:0 28px 70px rgba(0,0,0,.52);
+    }
+
+    .card:hover::before{
+      transform:translateX(130%);
+    }
+
+    .card:hover::after{
+      opacity:.48;
+      transform:scale(1.08);
+    }
+
+    .card-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:28px;
+    }
+
+    .tag{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      font-size:.8rem;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.1);
+      background:rgba(255,255,255,.05);
+      color:#d7e6ff;
+      width:max-content;
+    }
+
+    .icon{
+      width:46px;
+      height:46px;
+      border-radius:16px;
+      display:grid;
+      place-items:center;
+      font-size:1.25rem;
+      border:1px solid rgba(255,255,255,.1);
+      background:rgba(255,255,255,.06);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+      flex:none;
+    }
+
+    .card h2{
+      margin:0 0 10px;
+      font-size:1.35rem;
+      letter-spacing:-.02em;
+    }
+
+    .card p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.7;
+      font-size:.96rem;
+      max-width:54ch;
+    }
+
+    .card-bottom{
+      margin-top:30px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+
+    .pill-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+
+    .pill{
+      padding:8px 11px;
+      border-radius:999px;
+      font-size:.76rem;
+      color:#d9e7fb;
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.09);
+    }
+
+    .open-link{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      font-weight:700;
+      color:#f7fbff;
+      letter-spacing:.01em;
+    }
+
+    .open-link span:last-child{
+      transition:transform .24s ease;
+    }
+
+    .card:hover .open-link span:last-child{
+      transform:translateX(4px);
+    }
+
+    .footer-note{
+      margin-top:18px;
+      padding:16px 18px;
+      border-radius:18px;
+      color:var(--muted);
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.035);
+      font-size:.92rem;
+      line-height:1.7;
+    }
+
+    @media (max-width: 900px){
+      .meta{
+        grid-template-columns:1fr;
+      }
+
+      .section{
+        grid-template-columns:1fr;
+      }
+
+      .hero{
+        padding:24px;
+        border-radius:24px;
+      }
+
+      .card{
+        min-height:250px;
+      }
+    }
+
+    @media (max-width: 560px){
+      .page{
+        width:min(100% - 20px, 1200px);
+        padding:20px 0 28px;
+      }
+
+      .hero h1{
+        font-size:2rem;
+      }
+
+      .hero p{
+        font-size:.95rem;
+        line-height:1.65;
+      }
+
+      .topbar{
+        margin-bottom:20px;
+      }
+
+      .card{
+        padding:18px;
+        border-radius:22px;
+      }
+
+      .card h2{
+        font-size:1.18rem;
+      }
+
+      .footer-note{
+        font-size:.88rem;
+      }
+    }
+  </style>
 </head>
-
 <body>
+  <main class="page">
+    <section class="hero">
+      <div class="topbar">
+        <div class="repo-chip">
+          <span class="repo-dot"></span>
+          <span>GitHub Pages Lab Repository • EXP-4</span>
+        </div>
 
-<div class="container">
-    <h1>EXP-4 Dashboard</h1>
+        <div class="status-wrap">
+          <div class="status">Single-file experiment pages</div>
+          <div class="status">Responsive UI</div>
+          <div class="status">Static hosting ready</div>
+        </div>
+      </div>
 
-    <a href="./1.4.3/">Experiment 1.4.3</a>
-    <a href="./2.1.3/">Experiment 2.1.3</a>
-</div>
+      <h1>Experiment Dashboard</h1>
+      <p>
+        Central connection page for the EXP-4 repository. Each experiment opens from its own folder-level
+        <code>index.html</code> and stays fully compatible with GitHub Pages static hosting.
+      </p>
 
+      <div class="meta">
+        <div class="meta-card">
+          <span>Repository</span>
+          <strong>EXP-4</strong>
+        </div>
+        <div class="meta-card">
+          <span>Current folders</span>
+          <strong>1.4.3 • 2.1.3</strong>
+        </div>
+        <div class="meta-card">
+          <span>Deployment mode</span>
+          <strong>Main branch / root</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <a class="card card-1" href="./1.4.3/">
+        <div>
+          <div class="card-top">
+            <div class="tag">Experiment 1.4.3</div>
+            <div class="icon">🎟️</div>
+          </div>
+
+          <h2>Concurrent Ticket Booking System</h2>
+          <p>
+            Frontend simulation of seat locking, booking contention, lock timeout, retry flow, user activity
+            logs, and backend-style distributed lock explanation for static demonstration.
+          </p>
+        </div>
+
+        <div class="card-bottom">
+          <div class="pill-row">
+            <span class="pill">Seat states</span>
+            <span class="pill">TTL lock</span>
+            <span class="pill">Logs</span>
+          </div>
+
+          <div class="open-link">
+            <span>Open experiment</span>
+            <span>→</span>
+          </div>
+        </div>
+      </a>
+
+      <a class="card card-2" href="./2.1.3/">
+        <div>
+          <div class="card-top">
+            <div class="tag">Experiment 2.1.3</div>
+            <div class="icon">🧪</div>
+          </div>
+
+          <h2>Experiment Slot Ready</h2>
+          <p>
+            Placeholder connection page for the next problem statement. The folder is already linked and ready
+            for a full single-file experiment build when you provide the exact task.
+          </p>
+        </div>
+
+        <div class="card-bottom">
+          <div class="pill-row">
+            <span class="pill">Folder linked</span>
+            <span class="pill">UI ready</span>
+            <span class="pill">GitHub Pages</span>
+          </div>
+
+          <div class="open-link">
+            <span>Open experiment</span>
+            <span>→</span>
+          </div>
+        </div>
+      </a>
+    </section>
+
+    <div class="footer-note">
+      Keep every experiment self-contained inside its own folder <code>index.html</code> with internal CSS and JS only.
+    </div>
+  </main>
 </body>
 </html>
